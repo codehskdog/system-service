@@ -3,6 +3,7 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { NacosModule } from '@app/nacos';
 import { PrismaModule } from '@app/prisma';
+import { RedisModule } from '@app/redis';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { PrismaModule } from '@app/prisma';
       serviceName: 'user',
     }),
     PrismaModule,
+    RedisModule
   ],
   controllers: [UserController],
   providers: [UserService],

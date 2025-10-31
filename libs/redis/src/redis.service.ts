@@ -3,22 +3,26 @@ import {
   OnModuleInit,
   OnModuleDestroy,
   Logger,
+  Inject,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { createClient, RedisClientType } from 'redis';
 
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
-  private readonly client: RedisClientType;
+
+  @Inject(ConfigService)
+  private configService: ConfigService;
+
+  private client: RedisClientType;
   private readonly logger = new Logger(RedisService.name);
-  constructor() {
-    this.client = createClient({
-      url: process.env.REDIS_URL,
-      password: process.env.REDIS_PASSWORD,
-    });
-  }
 
   async onModuleInit() {
+    const name = this.configService.get('RUN_NAME');
+    const config = this.configService.get(`nacos_config_${name}`);
+    this.client = createClient(config.redis);
     await this.client.connect();
+    this.logger.log('Redis服务启动成功')
     this.client.on('error', (err) => this.logger.error('Redis服务异常r', err));
   }
 
