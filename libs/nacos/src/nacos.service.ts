@@ -24,6 +24,7 @@ export interface NacosOptions {
   serviceName: string; //Service name
   instance?: Partial<Instance>; //Instance
   groupName?: string;
+  skipRegister?: boolean;
 }
 
 @Injectable()
@@ -53,7 +54,10 @@ export class NacosService implements OnApplicationBootstrap, OnModuleDestroy {
       password: this.configService.get<string>('NACOS_SECRET_PWD'),
     });
     await this.client.ready();
-    await this.register();
+    if (!this.options.skipRegister) {
+      await this.register();
+    }
+
     this.logger.log('Nacos客户端准备就绪');
   }
   getClient(): NacosNamingClient {
@@ -67,20 +71,26 @@ export class NacosService implements OnApplicationBootstrap, OnModuleDestroy {
     await this.client.registerInstance(
       this.options.serviceName,
       // @ts-ignore
-      { ...this.instance, ...this.options.instance },
+      {
+        ...this.instance,
+        ...this.options.instance,
+      },
       this.options.groupName,
     );
   }
   async destroy() {
-    await this.client.deregisterInstance(
-      this.options.serviceName,
-      // @ts-ignore
-      { ...this.instance, ...this.options.instance },
-      this.options.groupName,
-    );
+    if (!this.options.skipRegister) {
+      await this.client.deregisterInstance(
+        this.options.serviceName,
+        // @ts-ignore
+        { ...this.instance, ...this.options.instance },
+        this.options.groupName,
+      );
+    }
   }
 
   async onModuleDestroy() {
+    this.logger.log('Nacos客户端准备销毁');
     await this.destroy();
   }
 }

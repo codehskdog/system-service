@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { UserModule } from './user.module';
 import { NacosConfigModule, NacosConfigService } from '@app/nacos';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
@@ -16,7 +16,7 @@ async function bootstrap() {
     : nacosConfigService.getLocalConfig('RUN_NAME');
 
   const res = await nacosConfigService.getConfig(name);
-
+  await nacosConfigService.close();
   if (!res.run) {
     throw new Error('用户服务配置错误');
   }
@@ -34,6 +34,7 @@ async function bootstrap() {
   );
   const configService = app.get<ConfigService>(ConfigService);
   configService.set(configName, res);
+  app.useGlobalPipes(new ValidationPipe());
   await app.listen();
   Logger.log(`用户服务已经启动`);
   await configApp.close();

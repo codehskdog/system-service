@@ -5,9 +5,8 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PrismaService extends PrismaClient {
-
   @Inject(ConfigService)
-  private configService: ConfigService
+  private configService: ConfigService;
 
   private readonly logger = new Logger(PrismaService.name);
 
@@ -16,8 +15,8 @@ export class PrismaService extends PrismaClient {
       const name = this.configService.get('RUN_NAME');
       const config = this.configService.get(`nacos_config_${name}`);
       const client = new PrismaClient({
-        datasources: config.datasources
-      })
+        datasources: config.datasources,
+      });
       Object.assign(this, client);
       await this.$connect();
     } catch (error) {

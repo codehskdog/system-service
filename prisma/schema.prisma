@@ -20,4 +20,41 @@ model User {
     name     String?
     username String? @unique
     password String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    roles Role[] @relation("UserRole")
+}
+
+model Role {
+    id          String   @id @unique @default(uuid())
+    name        String   @unique // 角色标识（如 "admin"）
+    description String // 角色描述（如 "超级管理员"）
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    // 与用户的多对多关系（通过中间表 UserRole 关联）
+    users       User[]       @relation("UserRole")
+    // 与权限的多对多关系（通过中间表 RolePermission 关联）
+    permissions Permission[] @relation("RolePermission")
+}
+
+model Permission {
+    id          String       @id @unique @default(uuid())
+    parentId    String? // 父权限ID（ nullable，顶级权限无父ID）
+    // 父权限关联（多对一）：指定关联名称，绑定 parentId 和父权限 id
+    parent      Permission?  @relation("PermissionHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+    // 子权限关联（一对多）：必须与 parent 用同一个关联名称，作为反向关系
+    children    Permission[] @relation("PermissionHierarchy")
+    name        String       @unique // 权限标识（全局唯一，如 "user:create"）
+    description String // 权限描述
+    /// 权限类型 1: 菜单权限 2: 操作权限 
+    type        Int
+    isSystem    Boolean      @default(false) // 系统内置权限标记
+    createdAt   DateTime     @default(now())
+    updatedAt   DateTime     @updatedAt
+
+    // 与角色的多对多关系（关联名称需和 Role 模型一致）
+    roles Role[] @relation("RolePermission")
 }

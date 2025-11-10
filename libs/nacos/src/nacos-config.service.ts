@@ -40,6 +40,9 @@ export class NacosConfigService implements OnModuleInit, OnModuleDestroy {
   async onModuleDestroy() {
     await this.client.close();
   }
+  async close() {
+    await this.client.close();
+  }
   async getConfig(dataId: string, group = 'DEFAULT_GROUP') {
     const _dataId = `naocs_config_${dataId}`;
     if (this.configService.get(_dataId)) {
@@ -89,5 +92,16 @@ export class NacosConfigService implements OnModuleInit, OnModuleDestroy {
 
   getLocalConfig(dataId: string) {
     return this.configService.get(dataId);
+  }
+  subscribe(dataId: string, callback: Function, group = 'DEFAULT_GROUP') {
+    return this.client.subscribe(
+      {
+        dataId,
+        group,
+      },
+      (config) => {
+        callback(this.parseConfig(config, 'json'));
+      },
+    );
   }
 }

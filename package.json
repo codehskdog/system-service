@@ -27,6 +27,8 @@
     "@nestjs/microservices": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
     "@prisma/client": "6.18.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
     "kafkajs": "^2.2.4",
     "nacos": "^2.6.0",
     "nodemailer": "^7.0.10",
@@ -85,7 +87,9 @@
     "moduleNameMapper": {
       "^@app/prisma(|/.*)$": "<rootDir>/libs/prisma/src/$1",
       "^@app/redis(|/.*)$": "<rootDir>/libs/redis/src/$1",
-      "^@app/nacos(|/.*)$": "<rootDir>/libs/nacos/src/$1"
+      "^@app/nacos(|/.*)$": "<rootDir>/libs/nacos/src/$1",
+      "^@app/client(|/.*)$": "<rootDir>/libs/client/src/$1",
+      "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1"
     }
   }
 }
