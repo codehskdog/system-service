@@ -34,6 +34,7 @@ async function bootstrap() {
   );
   const configService = app.get<ConfigService>(ConfigService);
   configService.set(configName, res);
+  configService.set('jwt', res?.jwt);
   app.useGlobalPipes(new ValidationPipe());
   await app.listen();
   Logger.log(`用户服务已经启动`);

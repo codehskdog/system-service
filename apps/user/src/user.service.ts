@@ -8,16 +8,20 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { ClientKafka } from '@nestjs/microservices';
 import { Permission, Role } from '@prisma/client';
-import { UserBusinessError } from './utils';
+import { hashPassword, UserBusinessError, verifyPassword } from './utils';
 import { Status } from './code';
 import { RES } from '@app/common';
 import { ClientService } from '@app/client';
 import { KAFKA_EMAIL_CLIENT } from '@app/client/model';
+import { AuthService } from '@app/auth';
 
 @Injectable()
 export class UserService implements OnApplicationBootstrap {
   @Inject(PrismaService)
   private readonly prismaService: PrismaService;
+
+  @Inject(AuthService)
+  private readonly authService: AuthService;
 
   private emailClient: ClientKafka;
 
@@ -88,17 +92,47 @@ export class UserService implements OnApplicationBootstrap {
     if (hasUser) {
       throw new UserBusinessError(Status.HAD_CREATED_USER);
     }
+    const { salt, hash } = hashPassword(password);
     await this.prismaService.user.create({
       data: {
         username,
-        password,
+        password: hash,
+        salt,
       },
     });
-    this.clientService.getKafkaClient().emit(KAFKA_EMAIL_CLIENT.SEND_EMAIL, {
+    this.clientService.getKafkaClient()?.emit(KAFKA_EMAIL_CLIENT.SEND_EMAIL, {
       subject: '注册成功',
       text: `用户名: ${username} 密码: ${password}`,
     });
     return RES.Success;
+  }
+  async loginByUserName(username: string, d_password: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        username,
+      },
+    });
+    if (!user) {
+      throw new UserBusinessError(Status.USER_NOT_FOUND);
+    }
+    const { salt, password } = user;
+    if (!verifyPassword(d_password, salt, password)) {
+      throw new UserBusinessError(Status.USER_PASSWORD_ERROR);
+    }
+    const jwt = await this.authService.getJwt({
+      id: user.id,
+      username: user.username,
+    });
+    return {
+      ...jwt,
+      username: user.username,
+      name: user.name,
+    };
+  }
+
+  async checkToken(token: string) {
+    const data = await this.authService.checkToken(token);
+    return data;
   }
   getHello(): string {
     return 'Hello World!';

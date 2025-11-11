@@ -5,8 +5,6 @@ import {
   OnApplicationBootstrap,
   OnModuleInit,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { ClientService } from '@app/client';
 import { USER_CLIENT } from '@app/client/model';
 
@@ -18,10 +16,16 @@ export class UserService implements OnApplicationBootstrap {
     this.clientService.subUserClient();
   }
 
-  create(createUserDto: CreateUserDto) {
+  create(createUserDto: any) {
     return this.clientService
       .getUserClient()
       .send(USER_CLIENT.CREATE_BY_USERNAME_PASSWORD, createUserDto);
+  }
+
+  loginByUserName(data: any) {
+    return this.clientService
+      .getUserClient()
+      .send(USER_CLIENT.LOGIN_BY_USERNAME_PASSWORD, data);
   }
 
   findAll() {
@@ -32,11 +36,17 @@ export class UserService implements OnApplicationBootstrap {
     return `This action returns a #${id} user`;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  update(id: number, updateUserDto: any) {
     return `This action updates a #${id} user`;
   }
 
   remove(id: number) {
     return `This action removes a #${id} user`;
+  }
+
+  checkToken(token: string) {
+    return this.clientService
+      .getUserClient()
+      .send(USER_CLIENT.CHECK_TOKEN, token);
   }
 }

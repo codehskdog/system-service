@@ -7,6 +7,7 @@ import { RedisModule } from '@app/redis';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { ErrorFilter, ResponseInterceptor } from '@app/common';
 import { ClientModule } from '@app/client';
+import { AuthModule } from '@app/auth';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ClientModule } from '@app/client';
     PrismaModule,
     RedisModule,
     ClientModule,
+    AuthModule,
   ],
   controllers: [UserController],
   providers: [

@@ -17,7 +17,6 @@ import { Host } from 'nacos';
 export class ClientService implements OnApplicationBootstrap {
   private userClient: ClientProxy;
   private kafkaClient: ClientKafka;
-  private emailClients: any[];
 
   @Inject(NacosService)
   private readonly nacosService: NacosService;

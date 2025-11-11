@@ -11,6 +11,8 @@ export class User {
 
   password?: string;
 
+  salt?: string;
+
   createdAt: Date;
 
   updatedAt: Date;

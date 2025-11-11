@@ -6,11 +6,12 @@ import { NacosModule } from '@app/nacos';
 // import { RoleModule } from './role/role.module';
 import { Client } from '@nestjs/microservices';
 import { ClientModule } from '@app/client';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { UserModule } from './user/user.module';
 import { RoleModule } from './role/role.module';
 import { ErrorFilter, NormalErrorFilter } from '@app/common';
-
+import { AuthGuard } from './guard/auth.guard';
+import { UserService } from './user/user.service';
 @Module({
   imports: [
     NacosModule.forRoot({
@@ -30,6 +31,10 @@ import { ErrorFilter, NormalErrorFilter } from '@app/common';
     {
       provide: APP_FILTER,
       useClass: NormalErrorFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
     },
   ],
 })
