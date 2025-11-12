@@ -2,7 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { UserModule } from './user.module';
 import { NacosConfigModule, NacosConfigService } from '@app/nacos';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpStatus,
+  Logger,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
@@ -35,7 +40,20 @@ async function bootstrap() {
   const configService = app.get<ConfigService>(ConfigService);
   configService.set(configName, res);
   configService.set('jwt', res?.jwt);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      stopAtFirstError: true,
+      exceptionFactory(errors) {
+        return new BadRequestException(
+          {
+            code: 10001,
+            message: Object.values(errors[0].constraints)[0],
+          },
+          'Unprocessable Entity', // 状态码描述
+        );
+      },
+    }),
+  );
   await app.listen();
   Logger.log(`用户服务已经启动`);
   await configApp.close();

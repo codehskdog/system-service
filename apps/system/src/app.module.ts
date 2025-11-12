@@ -6,10 +6,14 @@ import { NacosModule } from '@app/nacos';
 // import { RoleModule } from './role/role.module';
 import { Client } from '@nestjs/microservices';
 import { ClientModule } from '@app/client';
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { UserModule } from './user/user.module';
 import { RoleModule } from './role/role.module';
-import { ErrorFilter, NormalErrorFilter } from '@app/common';
+import {
+  ErrorFilter,
+  NormalErrorFilter,
+  ResponseInterceptor,
+} from '@app/common';
 import { AuthGuard } from './guard/auth.guard';
 import { UserService } from './user/user.service';
 @Module({
@@ -35,6 +39,10 @@ import { UserService } from './user/user.service';
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
     },
   ],
 })

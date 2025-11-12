@@ -29,7 +29,7 @@ export class AuthService {
       ttl: expiresIn,
     });
     return {
-      jwt,
+      token: jwt,
       expiresIn,
     };
   }

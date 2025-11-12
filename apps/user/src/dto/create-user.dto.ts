@@ -11,5 +11,6 @@ export class CreateUserDtoByUserName extends PrismaModel.User {
   @IsString({ message: '密码必须是字符串' })
   @IsNotEmpty({ message: '密码不能为空' })
   @MinLength(6, { message: '密码至少6个字符' })
+  @MaxLength(16, { message: '密码最多12个字符' })
   password: string;
 }

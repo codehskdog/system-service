@@ -8,16 +8,19 @@ import {
   Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
+import { UnNeedAuth } from '../guard/auth.guard';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @UnNeedAuth()
   @Post()
   create(@Body() createUserDto: any) {
     return this.userService.create(createUserDto);
   }
 
+  @UnNeedAuth()
   @Post('login')
   loginByUserName(@Body() data: any) {
     return this.userService.loginByUserName(data);

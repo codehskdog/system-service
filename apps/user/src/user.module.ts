@@ -5,7 +5,7 @@ import { NacosModule } from '@app/nacos';
 import { PrismaModule } from '@app/prisma';
 import { RedisModule } from '@app/redis';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
-import { ErrorFilter, ResponseInterceptor } from '@app/common';
+import { ErrorFilter } from '@app/common';
 import { ClientModule } from '@app/client';
 import { AuthModule } from '@app/auth';
 
